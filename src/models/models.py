@@ -11,12 +11,12 @@ class NaiveBayes:
     # E.g.: {'A': 0.5, 'B':0.3, 'C': 0.2}
     class_probabilities = {}
 
-    # Keep all probablities. This will be used for prediction.
+    # Keep all mach counts. This will be used for prediction.
     # E.g.:{'f1=1 | A':x, 'f1=1 | A': y}
-    all_probabilities = {}
+    all_counts = {}
 
     def _calc_class_probabilities(self, classes: pd.DataFrame) -> None:
-        """Calculate probabilities for each class to occurr.
+        """Calculate probability of occurrency for each class.
 
         Parameters
         ----------
@@ -42,12 +42,34 @@ class NaiveBayes:
         """
         # Extract classes
         classes = data.iloc[:, labels]
-        # Calculate classes probabilities
+        # Count classes probabilities
         self._calc_class_probabilities(classes)
         print(self.class_probabilities)
-        # For each class
-        #   Calculate  
-        n = 0  # number of examples that match example
-        c = 0  # number of examples of classification
-        p = 1  # smoothing prior
-        return (n + e * p) / (c + e)
+        # For each class, calculate  match count for any column
+        # e.g.: P(x=1 | C)
+        for c in self.class_probabilities.keys():
+            print( c in list(data.columns))
+            # Filter entries classified as c
+            filtered_df = data.query('{} == 1'.format(c))
+            # Remove target columns
+            filtered_df.drop(labels=data.columns[labels], axis=1)
+            print()
+            class_counts = {}
+            # For each column, calulate matches
+            class_counts = {'{}={}|{}'.format(column, val, c):
+                            filtered_df[column][filtered_df[column] == val].shape[0]
+                            for column in filtered_df.columns
+                            for val in filtered_df[column].unique()
+                            }
+            # for column in filtered_df.columns:
+            #     values = filtered_df[column]
+            #     for val in values.unique():     
+            #         match = '{} == {}'.format(column, val)
+            #         key = '{}={}|{}'.format(column, val, c)
+            #         count = values[values == val].shape[0]
+            #         class_counts[key] = count
+
+            print(class_counts)
+            self.all_counts.update(class_counts)
+
+        # print(self.all_counts)

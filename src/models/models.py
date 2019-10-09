@@ -11,9 +11,12 @@ class NaiveBayes:
     # E.g.: {'A': 0.5, 'B':0.3, 'C': 0.2}
     class_probabilities = {}
 
-    # Keep all mach counts. This will be used for prediction.
+    # Keep all match counts. This will be used for prediction.
     # E.g.:{'f1=1 | A':x, 'f1=1 | A': y}
     all_counts = {}
+
+    # Train size, used for calculating count of class
+    train_size = 0
 
     # Equivalent sample size
     e = 0
@@ -43,8 +46,10 @@ class NaiveBayes:
             equivalent sample size, used for adapting to very rare classes.
             Default value is 1.
         """
+        self.train_size = data.shape[0]
         # Extract classes
         classes = data.iloc[:, labels]
+        assert(classes.shape[1] == 4)
         # Count classes probabilities
         self._calc_class_probabilities(classes)
         # For each class, calculate  match count for any column
@@ -93,19 +98,22 @@ class NaiveBayes:
                 # Count number of examples that from class c
                 # that have value 'val' for feature 'feature'
                 match = '{}={}|{}'.format(feature, val, c)
-                n_match = self.all_counts[match]
+                n_match = self.all_counts.get(match, 0)
 
-                # Count number of examples of class C
-                n_class = prob_class * len(self.class_probabilities)
+                p_class = self.class_probabilities[c]
+
+                # Count number of examples of class c
+                n_class = p_class * self.train_size
 
                 # Estimate probabilty
-                prob = (n_match + e * prob_class) / n_class + e
+                prob = (n_match + self.e * p_class) / (n_class + self.e)
 
                 # Calculate probability of example being classified as c
                 prob_class *= prob
 
+            assert(1 > prob_class >= 0)
             # Keep the maximum probability
-            if(prob_class > max_prob):
+            if(prob_class >= max_prob):
                 label = c
                 max_prob = prob_class
 
@@ -123,3 +131,14 @@ class NaiveBayes:
         labels: list
             list of label for class classified for each entry
         """
+        labels = []
+        n = query.shape[0]
+        i = 1
+        for index, row in query.iterrows():
+            label = self._predict(row)
+            labels.append(label)
+            print('{}/{}'.format(i, n))
+            i += 1
+
+        # TODO: use labels for metrics
+        return labels

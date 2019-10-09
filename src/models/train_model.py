@@ -8,5 +8,15 @@ df.columns = df.columns.str.replace(' ', '_')
 
 labels_index = df.columns.str.startswith('class_')
 
+# Split data
+df_copy = df.copy()
+train_set = df_copy.sample(frac=0.77, random_state=42)
+test_set = df_copy.drop(train_set.index)
+test_set.drop(labels=df.columns[labels_index], axis=1, inplace=True)
+assert(test_set.shape[1] == (df.shape[1]-4))
+
+
 nb = NaiveBayes()
-nb.train(df, labels_index)
+nb.train(train_set, labels_index)
+
+print(nb.test(test_set))

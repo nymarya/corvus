@@ -15,6 +15,9 @@ class NaiveBayes:
     # E.g.:{'f1=1 | A':x, 'f1=1 | A': y}
     all_counts = {}
 
+    # Equivalent sample size
+    e = 0
+
     def _calc_class_probabilities(self, classes: pd.DataFrame) -> None:
         """Calculate probability of occurrency for each class.
 
@@ -44,7 +47,6 @@ class NaiveBayes:
         classes = data.iloc[:, labels]
         # Count classes probabilities
         self._calc_class_probabilities(classes)
-        print(self.class_probabilities)
         # For each class, calculate  match count for any column
         # e.g.: P(x=1 | C)
         for c in self.class_probabilities.keys():
@@ -61,3 +63,63 @@ class NaiveBayes:
                             }
 
             self.all_counts.update(class_counts)
+
+    def _predict(self, query: pd.Series) -> str:
+        """ Perform classification of one entry
+
+        Parameters
+        ----------
+        query: pd.Series
+            entry used for prediction
+
+        Return
+        ------
+        label: str
+            label for class classified for query
+        """
+
+        # Init values
+        label = ""
+        max_prob = 0.0
+
+        # For each class A, calculate probability using formula
+        # P(A) * P(feature_1=val1 | A) ... * (P(feature_2=val2 | A)
+        for c in self.class_probabilities.keys():
+            # Recover P(A)
+            prob_class = self.class_probabilities[c]
+            # Calculate P(feature=val | A) for each feature
+            # using m-estimate
+            for feature, val in query.items():
+                # Count number of examples that from class c
+                # that have value 'val' for feature 'feature'
+                match = '{}={}|{}'.format(feature, val, c)
+                n_match = self.all_counts[match]
+
+                # Count number of examples of class C
+                n_class = prob_class * len(self.class_probabilities)
+
+                # Estimate probabilty
+                prob = (n_match + e * prob_class) / n_class + e
+
+                # Calculate probability of example being classified as c
+                prob_class *= prob
+
+            # Keep the maximum probability
+            if(prob_class > max_prob):
+                label = c
+                max_prob = prob_class
+
+        return label
+
+    def test(self, query: pd.DataFrame) -> list:
+        """Use the model for prediction.
+
+        Parameters
+        ----------
+        query: pd.DataFrame
+
+        Return
+        ------
+        labels: list
+            list of label for class classified for each entry
+        """

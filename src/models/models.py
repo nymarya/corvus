@@ -48,12 +48,10 @@ class NaiveBayes:
         # For each class, calculate  match count for any column
         # e.g.: P(x=1 | C)
         for c in self.class_probabilities.keys():
-            print( c in list(data.columns))
             # Filter entries classified as c
             filtered_df = data.query('{} == 1'.format(c))
             # Remove target columns
             filtered_df.drop(labels=data.columns[labels], axis=1)
-            print()
             class_counts = {}
             # For each column, calulate matches
             class_counts = {'{}={}|{}'.format(column, val, c):
@@ -61,15 +59,5 @@ class NaiveBayes:
                             for column in filtered_df.columns
                             for val in filtered_df[column].unique()
                             }
-            # for column in filtered_df.columns:
-            #     values = filtered_df[column]
-            #     for val in values.unique():     
-            #         match = '{} == {}'.format(column, val)
-            #         key = '{}={}|{}'.format(column, val, c)
-            #         count = values[values == val].shape[0]
-            #         class_counts[key] = count
 
-            print(class_counts)
             self.all_counts.update(class_counts)
-
-        # print(self.all_counts)

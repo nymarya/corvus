@@ -27,5 +27,7 @@ assert(test_set.shape[1] == (df.shape[1]-4))
 if(model == 'naive_bayes'):
     nb = NaiveBayes()
     nb.train(train_set, labels_index)
+
+    print("Trained")
 else:
     print("Invalid type: " + model)

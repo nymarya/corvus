@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class NaiveBayes:
     """ Implementation of a naïve version of the Bayesian belief network.
     The features are assumed to be independent.
@@ -19,7 +20,10 @@ class NaiveBayes:
     train_size = 0
 
     # Equivalent sample size
-    e = 0
+    e = 1
+
+    def __init__(self, e: int = 1):
+        self.e = e
 
     def _calc_class_probabilities(self, classes: pd.DataFrame) -> None:
         """Calculate probability of occurrency for each class.
@@ -34,7 +38,7 @@ class NaiveBayes:
         self.class_probabilities = {label: count/n
                                     for label, count in labels.items()}
 
-    def train(self, data: pd.DataFrame, labels: list, e: int=1):
+    def train(self, data: pd.DataFrame, labels: list):
         """
         Parameters
         ----------
@@ -142,3 +146,10 @@ class NaiveBayes:
 
         # TODO: use labels for metrics
         return labels
+
+class SVM:
+    """ Implementation of least squares version of support vector machine
+    algorithm for classification.
+
+    """
+

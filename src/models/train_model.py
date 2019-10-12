@@ -10,7 +10,7 @@ parser.add_argument('model', metavar='string', type=str, nargs='?',
 args = parser.parse_args()
 model = args.model
 
-df = pd.read_csv('data/processed/accidents_dataset.csv', sep=';', 
+df = pd.read_csv('data/processed/accidents_dataset.csv', sep=';',
                  index_col='Unnamed: 0')
 
 df.columns = df.columns.str.replace(' ', '_')

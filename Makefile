@@ -16,6 +16,8 @@ else
 HAS_CONDA=True
 endif
 
+
+args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
@@ -30,8 +32,8 @@ data: requirements
 	$(PYTHON_INTERPRETER) src/data/make_dataset.py
 
 ## Make Dataset
-train: requirements
-	$(PYTHON_INTERPRETER) src/models/train_model.py
+train: 
+	$(PYTHON_INTERPRETER) src/models/train_model.py $(model)
 
 ## Delete all compiled Python files
 clean:

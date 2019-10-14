@@ -46,9 +46,6 @@ class NaiveBayes:
             dataframe containg all train data
         labels: list
             list of classes columns indexes
-        e: int
-            equivalent sample size, used for adapting to very rare classes.
-            Default value is 1.
         """
         self.train_size = data.shape[0]
         # Extract classes
@@ -147,9 +144,19 @@ class NaiveBayes:
         # TODO: use labels for metrics
         return labels
 
+
 class SVM:
     """ Implementation of least squares version of support vector machine
     algorithm for classification.
 
     """
 
+    def train(self, data: pd.DataFrame, labels: list):
+        """
+        Parameters
+        ----------
+        data: pandas dataframe
+            dataframe containg all train data
+        labels: list
+            list of classes columns indexes
+        """

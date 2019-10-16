@@ -151,6 +151,24 @@ class SVM:
 
     """
 
+    def _loss_function(self, yn: int, y: int) -> int:
+        """ Loss function that returns 0 if yn equals y, and 1 otherwise.
+
+        Parameters
+        ----------
+        yn: int
+            classified label.
+        y: int
+            actual label.
+
+        Return
+        ------
+        loss: int
+            0 if yn equals y, and 1 otherwise.
+        """
+
+        return (0 if yn == y else 1)
+
     def train(self, data: pd.DataFrame, labels: list):
         """
         Parameters

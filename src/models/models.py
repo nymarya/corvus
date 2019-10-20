@@ -146,10 +146,19 @@ class NaiveBayes:
 
 
 class SVM:
-    """ Implementation of least squares version of support vector machine
+    """ Implementation of support vector machine
     algorithm for classification.
 
     """
+
+    # regularization parameter that trades off margin size and training error
+    self.C = 1
+
+    # error
+    self.e = 0.01
+
+    def __init__(self, C: int = 0, e: int ):
+        self.C = C
 
     def _loss_function(self, yn: int, y: int) -> int:
         """ Loss function that returns 0 if yn equals y, and 1 otherwise.
@@ -167,7 +176,7 @@ class SVM:
             0 if yn equals y, and 1 otherwise.
         """
 
-        return (0 if yn == y else 1)
+        return (0 if yn == y else 100)
 
     def train(self, data: pd.DataFrame, labels: list):
         """
@@ -178,3 +187,23 @@ class SVM:
         labels: list
             list of classes columns indexes
         """
+        n = data.shape[0]  # get sample size
+
+        # init params
+        W = [ {} for i in range(n)]  # init set of constraints
+        slacks = [ 0 for i in range(n)]  # init slack variables 
+
+        # iterate until no W has changed during iteration
+        repeat = True
+        while repeat:
+            repeat = False
+            for i in range(n):
+                y = argmax(x[i], w, y[i], )
+                var = w [self._phi(x[i], y[i]) - self._phi(x[i] , y)]
+                if self._loss_function(y_i, y) - var > (slacks[i] + self.e):
+                    repeat = True
+                    W[i].append(y)
+                    w, slack = argmin(w, slack, i , W)
+                    
+
+

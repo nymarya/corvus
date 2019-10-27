@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 class NaiveBayes:
@@ -159,6 +160,7 @@ class SVM:
 
     def __init__(self, C: int = 0, e: int ):
         self.C = C
+        self.e = e
 
     def _loss_function(self, yn: int, y: int) -> int:
         """ Loss function that returns 0 if yn equals y, and 1 otherwise.
@@ -188,6 +190,10 @@ class SVM:
             list of classes columns indexes
         """
         n = data.shape[0]  # get sample size
+        n_features = n - len(labels)
+
+        # init w
+        self.w = np.zeros()
 
         # init params
         W = [ {} for i in range(n)]  # init set of constraints

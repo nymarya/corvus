@@ -153,12 +153,12 @@ class SVM:
     """
 
     # regularization parameter that trades off margin size and training error
-    self.C = 1
+    C = 1
 
     # error
-    self.e = 0.01
+    e = 0.01
 
-    def __init__(self, C: int = 0, e: int ):
+    def __init__(self, C: int = 0, e: int = 0.01):
         self.C = C
         self.e = e
 
@@ -180,6 +180,29 @@ class SVM:
 
         return (0 if yn == y else 100)
 
+    def _argmax(self, x_i, w, y_i, Y):
+        return y_i
+
+    def _argmin(self, w, slack, i , W):
+        return w, slack
+
+    def _phi(self, x: list, y: int) -> list:
+        """ Parameter vector that stacks x into position y.
+        Parameters
+        ----------
+        x: list
+            list of features
+        y: int
+            label
+        Return
+        ------
+        vector
+        """
+
+        vec = np.zeros( (self.n_labels, self.n_features))
+        vec[y] = x
+        return vec
+
     def train(self, data: pd.DataFrame, labels: list):
         """
         Parameters
@@ -190,12 +213,22 @@ class SVM:
             list of classes columns indexes
         """
         n = data.shape[0]  # get sample size
-        n_features = n - len(labels)
+        self.n_features = n - 1
 
-        # init w
-        self.w = np.zeros()
+        # Get x and y
+        x = data.drop(labels=data.columns[labels], axis=1).values
+        y = data.iloc[:, labels]
 
-        # init params
+        # Recover set of labels
+        print(data[data.columns[labels]])
+        Y = data.classificacao_acidente.unique()
+        print(Y)
+        self.n_labels = len(Y)
+
+        # Init w
+        self.w = np.zeros(self.n_features)
+
+        # Init params
         W = [ {} for i in range(n)]  # init set of constraints
         slacks = [ 0 for i in range(n)]  # init slack variables 
 
@@ -204,12 +237,12 @@ class SVM:
         while repeat:
             repeat = False
             for i in range(n):
-                y = argmax(x[i], w, y[i], )
-                var = w [self._phi(x[i], y[i]) - self._phi(x[i] , y)]
-                if self._loss_function(y_i, y) - var > (slacks[i] + self.e):
+                y_hat = self._argmax(x[i], self.w, y.iloc[:,i], Y)
+                var = np.transpose(self.w) * [self._phi(x[i], y[i]) - self._phi(x[i] , y_hat)]
+                if self._loss_function(y_i, y_hat) * (1 - var) > (slacks[i] + self.e):
                     repeat = True
-                    W[i].append(y)
-                    w, slack = argmin(w, slack, i , W)
+                    W[i].append(y_hat)
+                    self.w, slack = self._argmin(self.w, slack, i , W)
                     
 
 

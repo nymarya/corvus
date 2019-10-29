@@ -180,7 +180,7 @@ class SVM:
 
         return (0 if yn == y else 100)
 
-    def _argmax(self, x_i, w, y_i, Y):
+    def _separating_oracle(self, x_i, w, y_i, Y):
         return y_i
 
     def _argmin(self, w, slack, i , W):
@@ -220,9 +220,7 @@ class SVM:
         y = data.iloc[:, labels]
 
         # Recover set of labels
-        print(data[data.columns[labels]])
         Y = data.classificacao_acidente.unique()
-        print(Y)
         self.n_labels = len(Y)
 
         # Init w
@@ -237,8 +235,11 @@ class SVM:
         while repeat:
             repeat = False
             for i in range(n):
-                y_hat = self._argmax(x[i], self.w, y.iloc[:,i], Y)
-                var = np.transpose(self.w) * [self._phi(x[i], y[i]) - self._phi(x[i] , y_hat)]
+                # Find the most violated constraint
+                y_hat = self._separating_oracle(x[i], self.w, y.iloc[:,i], Y)
+                # If this constraint is violated by more than the
+                # desired precision, the constraint is added to the working set
+                var = np.dot(self.w, [self._phi(x[i], y[i]) - self._phi(x[i] , y_hat)])
                 if self._loss_function(y_i, y_hat) * (1 - var) > (slacks[i] + self.e):
                     repeat = True
                     W[i].append(y_hat)

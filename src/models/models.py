@@ -26,41 +26,40 @@ class NaiveBayes:
     def __init__(self, e: int = 1):
         self.e = e
 
-    def _calc_class_probabilities(self, classes: pd.DataFrame) -> None:
+    def _calc_class_probabilities(self, classes: pd.Series) -> None:
         """Calculate probability of occurrency for each class.
 
         Parameters
         ----------
-        classes: pandas dataframe
-            pandas dataframe contaning the categorized classes
+        classes: pd.Series
+            pandas series contaning the categorized classes
         """
-        labels = classes.idxmax(axis=1).value_counts()
+        labels = classes.value_counts()
         n = classes.shape[0]
         self.class_probabilities = {label: count/n
                                     for label, count in labels.items()}
 
-    def train(self, data: pd.DataFrame, labels: list):
+    def train(self, data: pd.DataFrame, labels: str):
         """
         Parameters
         ----------
         data: pandas dataframe
             dataframe containg all train data
-        labels: list
-            list of classes columns indexes
+        labels: str
+            column name
         """
         self.train_size = data.shape[0]
         # Extract classes
-        classes = data.iloc[:, labels[0]].unique()
-        assert(classes.shape[1] == 4)
+        classes = data.loc[:, labels]
         # Count classes probabilities
         self._calc_class_probabilities(classes)
         # For each class, calculate  match count for any column
         # e.g.: P(x=1 | C)
         for c in self.class_probabilities.keys():
             # Filter entries classified as c
-            filtered_df = data.query('{} == 1'.format(c))
+            filtered_df = data.query('classificacao_acidente == {}'.format(c))
             # Remove target columns
-            filtered_df.drop(labels=data.columns[labels], axis=1)
+            filtered_df.drop(labels=[labels], axis=1)
             class_counts = {}
             # For each column, calulate matches
             class_counts = {'{}={}|{}'.format(column, val, c):
@@ -146,7 +145,6 @@ class NaiveBayes:
 
         # Update dict
         self.confusion_matrix['matrix'] = matrix
-        print(matrix)
 
 
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:
@@ -174,8 +172,6 @@ class NaiveBayes:
             i += 1
 
         self._confusion_matrix(actual_labels, labels)
-        print(labels)
-        print(actual_labels)
         return labels
 
 

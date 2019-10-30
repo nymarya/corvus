@@ -51,7 +51,7 @@ class NaiveBayes:
         self.train_size = data.shape[0]
         # Extract classes
         classes = data.iloc[:, labels]
-        assert(classes.shape[1] == 4)
+        assert(classes.shape[1] == 1)
         # Count classes probabilities
         self._calc_class_probabilities(classes)
         # For each class, calculate  match count for any column

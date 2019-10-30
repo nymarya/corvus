@@ -2,6 +2,8 @@ from models import NaiveBayes, SVM
 import pandas as pd
 
 import argparse
+import pickle
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('model', metavar='string', type=str, nargs='?',
@@ -25,12 +27,19 @@ test_set.drop(labels=df.columns[labels_index], axis=1, inplace=True)
 assert(test_set.shape[1] == (df.shape[1]-1))
 
 if(model == 'naive_bayes'):
-    nb = NaiveBayes()
-    nb.train(train_set, labels_index)
+    trained = NaiveBayes()
+    trained.train(train_set, labels_index)
 
     print("Trained")
 elif (model == "svm"):
-    svm = SVM()
-    svm.train(train_set, labels_index)
+    trained = SVM()
+    trained.train(train_set, labels_index)
 else:
     print("Invalid type: " + model)
+
+# Serialize model using pickle
+date = datetime.now().strftime("%Y%m%d_%H%M")
+filename = 'models/{}_{}.pickle'.format(model, date)
+with open(filename, 'wb') as f:
+    pickle.dump(trained, f, pickle.HIGHEST_PROTOCOL)
+    print("Model save at: " + filename)

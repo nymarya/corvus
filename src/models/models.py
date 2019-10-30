@@ -50,8 +50,8 @@ class NaiveBayes:
         """
         self.train_size = data.shape[0]
         # Extract classes
-        classes = data.iloc[:, labels]
-        assert(classes.shape[1] == 1)
+        classes = data.iloc[:, labels[0]].unique()
+        assert(classes.shape[1] == 4)
         # Count classes probabilities
         self._calc_class_probabilities(classes)
         # For each class, calculate  match count for any column
@@ -121,12 +121,43 @@ class NaiveBayes:
 
         return label
 
-    def test(self, query: pd.DataFrame) -> list:
+    def _confusion_matrix(self, actual_labels: list,
+                                predicted_labels: list) -> None:
+        """
+        """
+        n_labels = len(self.class_probabilities.keys())
+        # Create attribute as dict and keep labels indexes
+        self.confusion_matrix = { 
+            key: value for value, key in enumerate(self.class_probabilities.keys())
+        }
+        # Init matrix
+        matrix = [
+            [0 for i in range(n_labels)] for j in range(n_labels)
+        ]
+
+        # Fill matrix
+        # Rows: actual class
+        # Columns: predicted class
+        for ac in actual_labels:
+            for pc in predicted_labels:
+                ac_index = self.confusion_matrix[ac]
+                pc_index = self.confusion_matrix[pc]
+                matrix[ac_index][pc_index] += 1
+
+        # Update dict
+        self.confusion_matrix['matrix'] = matrix
+        print(matrix)
+
+
+    def test(self, query: pd.DataFrame, actual_labels: list) -> list:
         """Use the model for prediction.
 
         Parameters
         ----------
         query: pd.DataFrame
+            features
+        actual_labels: list
+            true labels for query
 
         Return
         ------
@@ -142,7 +173,9 @@ class NaiveBayes:
             print('{}/{}'.format(i, n))
             i += 1
 
-        # TODO: use labels for metrics
+        self._confusion_matrix(actual_labels, labels)
+        print(labels)
+        print(actual_labels)
         return labels
 
 

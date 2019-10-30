@@ -21,14 +21,17 @@ labels_index = df.columns.str.startswith('classificacao')
 
 # Split data
 df_copy = df.copy()
-train_set = df_copy.sample(frac=0.77, random_state=42)
+train_set = df_copy.sample(frac=0.90, random_state=42)
 test_set = df_copy.drop(train_set.index)
+test_labels = test_set.columns[labels_index]
 test_set.drop(labels=df.columns[labels_index], axis=1, inplace=True)
 assert(test_set.shape[1] == (df.shape[1]-1))
 
 if(model == 'naive_bayes'):
     trained = NaiveBayes()
     trained.train(train_set, labels_index)
+
+    trained.test(test_set, test_labels)
 
     print("Trained")
 elif (model == "svm"):

@@ -146,6 +146,10 @@ class NaiveBayes:
         # Update dict
         self.confusion_matrix['matrix'] = matrix
 
+        # Test
+        x = np.matrix(matrix)
+        x.sum()
+        assert( x.sum() == len(actual_labels))
 
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:
         """Use the model for prediction.

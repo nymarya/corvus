@@ -137,11 +137,14 @@ class NaiveBayes:
         # Fill matrix
         # Rows: actual class
         # Columns: predicted class
-        for ac in actual_labels:
-            for pc in predicted_labels:
-                ac_index = self.confusion_matrix[ac]
-                pc_index = self.confusion_matrix[pc]
-                matrix[ac_index][pc_index] += 1
+        n_samples = len(actual_labels)
+        for i in range(n_samples):
+            # for sample i, update the matrix
+            ac = actual_labels[i]
+            pc = predicted_labels[i]
+            ac_index = self.confusion_matrix[ac]
+            pc_index = self.confusion_matrix[pc]
+            matrix[ac_index][pc_index] += 1
 
         # Update dict
         self.confusion_matrix['matrix'] = matrix
@@ -172,10 +175,10 @@ class NaiveBayes:
         for index, row in query.iterrows():
             label = self._predict(row)
             labels.append(label)
-            print('{}/{}'.format(i, n))
+            print('Testing {}/{}'.format(i, n))
             i += 1
 
-        self._confusion_matrix(actual_labels, labels)
+        self._confusion_matrix(actual_labels.values, labels)
         return labels
 
 

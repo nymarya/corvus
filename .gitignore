@@ -89,3 +89,6 @@ target/
 .mypy_cache/
 
 local/
+
+# Cached models
+*.pickle

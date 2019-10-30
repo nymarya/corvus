@@ -19,7 +19,7 @@ df.columns = df.columns.str.replace(' ', '_')
 
 # Split data
 df_copy = df.copy()
-train_set = df_copy.sample(frac=0.99, random_state=42)
+train_set = df_copy.sample(frac=0.77, random_state=42)
 test_set = df_copy.drop(train_set.index)
 test_labels = test_set['classificacao_acidente']
 test_set.drop(labels=['classificacao_acidente'], axis=1, inplace=True)

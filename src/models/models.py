@@ -6,7 +6,7 @@ class NaiveBayes:
     """ Implementation of a naïve version of the Bayesian belief network.
     The features are assumed to be independent.
 
-    P(B | A) = P( B /\ A) / P(A)
+    P(B | A) = P( B ^ A) / P(A)
     """
 
     # Keep the probabilities of each class as a dictionary.
@@ -57,15 +57,15 @@ class NaiveBayes:
         # e.g.: P(x=1 | C)
         for c in self.class_probabilities.keys():
             # Filter entries classified as c
-            filtered_df = data.query('classificacao_acidente == {}'.format(c))
+            new_df = data.query('classificacao_acidente == {}'.format(c))
             # Remove target columns
-            filtered_df.drop(labels=[labels], axis=1)
+            new_df.drop(labels=[labels], axis=1)
             class_counts = {}
             # For each column, calulate matches
             class_counts = {'{}={}|{}'.format(column, val, c):
-                            filtered_df[column][filtered_df[column] == val].shape[0]
-                            for column in filtered_df.columns
-                            for val in filtered_df[column].unique()
+                            new_df[column][new_df[column] == val].shape[0]
+                            for column in new_df.columns
+                            for val in new_df[column].unique()
                             }
 
             self.all_counts.update(class_counts)
@@ -121,13 +121,14 @@ class NaiveBayes:
         return label
 
     def _confusion_matrix(self, actual_labels: list,
-                                predicted_labels: list) -> None:
+                          predicted_labels: list) -> None:
         """
         """
-        n_labels = len(self.class_probabilities.keys())
+        classes = self.class_probabilities.keys()
+        n_labels = len(classes)
         # Create attribute as dict and keep labels indexes
-        self.confusion_matrix = { 
-            key: value for value, key in enumerate(self.class_probabilities.keys())
+        self.confusion_matrix = {
+            key: value for value, key in enumerate(classes)
         }
         # Init matrix
         matrix = [
@@ -152,7 +153,7 @@ class NaiveBayes:
         # Test
         x = np.matrix(matrix)
         x.sum()
-        assert( x.sum() == len(actual_labels))
+        assert(x.sum() == len(actual_labels))
 
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:
         """Use the model for prediction.
@@ -219,7 +220,7 @@ class SVM:
     def _separating_oracle(self, x_i, w, y_i, Y):
         return y_i
 
-    def _argmin(self, w, slack, i , W):
+    def _argmin(self, w, slack, i, W):
         return w, slack
 
     def _phi(self, x: list, y: int) -> list:
@@ -235,7 +236,7 @@ class SVM:
         vector
         """
 
-        vec = np.zeros( (self.n_labels, self.n_features))
+        vec = np.zeros((self.n_labels, self.n_features))
         vec[y] = x
         return vec
 
@@ -263,8 +264,9 @@ class SVM:
         self.w = np.zeros(self.n_features)
 
         # Init params
-        W = [ {} for i in range(n)]  # init set of constraints
-        slacks = [ 0 for i in range(n)]  # init slack variables 
+        W = [{} for i in range(n)]  # init set of constraints
+        slacks = [0 for i in range(n)]  # init slack variables
+        self.slack = 0  # stub
 
         # iterate until no W has changed during iteration
         repeat = True
@@ -272,14 +274,13 @@ class SVM:
             repeat = False
             for i in range(n):
                 # Find the most violated constraint
-                y_hat = self._separating_oracle(x[i], self.w, y.iloc[:,i], Y)
+                y_hat = self._separating_oracle(x[i], self.w, y.iloc[:, i], Y)
                 # If this constraint is violated by more than the
                 # desired precision, the constraint is added to the working set
-                var = np.dot(self.w, [self._phi(x[i], y[i]) - self._phi(x[i] , y_hat)])
-                if self._loss_function(y_i, y_hat) * (1 - var) > (slacks[i] + self.e):
+                var1 = [self._phi(x[i], y[i]) - self._phi(x[i], y_hat)]
+                var = 1 - np.dot(self.w, var1)
+                precision = slacks[i] + self.e
+                if self._loss_function(y[i], y_hat) * var > precision:
                     repeat = True
                     W[i].append(y_hat)
-                    self.w, slack = self._argmin(self.w, slack, i , W)
-                    
-
-
+                    self.w, self.slack = self._argmin(self.w, self.slack, i, W)

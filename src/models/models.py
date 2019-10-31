@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+from model import Model
 
 
-class NaiveBayes:
+class NaiveBayes(Model):
     """ Implementation of a naïve version of the Bayesian belief network.
     The features are assumed to be independent.
 
@@ -120,51 +121,6 @@ class NaiveBayes:
 
         return label
 
-    def _confusion_matrix(self, actual_labels: list,
-                          predicted_labels: list) -> None:
-        """
-        """
-        classes = self.class_probabilities.keys()
-        n_labels = len(classes)
-        # Create attribute as dict and keep labels indexes
-        self.confusion_matrix = {
-            key: value for value, key in enumerate(classes)
-        }
-        # Init matrix
-        matrix = [
-            [0 for i in range(n_labels)] for j in range(n_labels)
-        ]
-
-        # Fill matrix
-        # Rows: actual class
-        # Columns: predicted class
-        n_samples = len(actual_labels)
-        for i in range(n_samples):
-            # for sample i, update the matrix
-            ac = actual_labels[i]
-            pc = predicted_labels[i]
-            ac_index = self.confusion_matrix[ac]
-            pc_index = self.confusion_matrix[pc]
-            matrix[ac_index][pc_index] += 1
-
-        # Update dict
-        self.confusion_matrix['matrix'] = matrix
-
-        # Test
-        x = np.matrix(matrix)
-        x.sum()
-        assert(x.sum() == len(actual_labels))
-
-    def _accuracy(self) -> float:
-        """Calculate the accuracy for the model. 
-
-        Return
-        ------
-        a float representing the models' accuracy
-        """
-        matrix = self.confusion_matrix['matrix']
-        return np.diag(matrix).sum() / np.sum(matrix)
-
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:
         """Use the model for prediction.
 
@@ -189,11 +145,11 @@ class NaiveBayes:
             print('Testing {}/{}'.format(i, n))
             i += 1
 
-        self._confusion_matrix(actual_labels.values, labels)
+        self._confusion_matrix(actual_labels.values, labels, self.class_probabilities.keys())
         return labels
 
 
-class SVM:
+class SVM(Model):
     """ Implementation of support vector machine
     algorithm for classification.
 

@@ -155,6 +155,16 @@ class NaiveBayes:
         x.sum()
         assert(x.sum() == len(actual_labels))
 
+    def _accuracy(self) -> float:
+        """Calculate the accuracy for the model. 
+
+        Return
+        ------
+        a float representing the models' accuracy
+        """
+        matrix = self.confusion_matrix['matrix']
+        return np.diag(matrix).sum() / np.sum(matrix)
+
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:
         """Use the model for prediction.
 

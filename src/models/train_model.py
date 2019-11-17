@@ -31,6 +31,8 @@ if(model == 'naive_bayes'):
 
     trained.test(test_set, test_labels)
 
+    print(trained._accuracy())
+
     print("Trained")
 elif (model == "svm"):
     trained = SVM()

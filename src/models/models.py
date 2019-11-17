@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from model import Model
+import operator
 
 
 class NaiveBayes(Model):
@@ -149,104 +150,223 @@ class NaiveBayes(Model):
         return labels
 
 
-class SVM(Model):
-    """ Implementation of support vector machine
-    algorithm for classification.
+# class SVM(Model):
+#     """ Implementation of support vector machine
+#     algorithm for classification.
 
-    """
+#     """
 
-    # regularization parameter that trades off margin size and training error
-    C = 1
+#     # regularization parameter that trades off margin size and training error
+#     C = 1
 
-    # error
-    e = 0.01
+#     # error
+#     e = 0.01
 
-    def __init__(self, C: int = 0, e: int = 0.01):
-        self.C = C
-        self.e = e
+#     def __init__(self, C: int = 0, e: int = 0.01):
+#         self.C = C
+#         self.e = e
 
-    def _loss_function(self, yn: int, y: int) -> int:
-        """ Loss function that returns 0 if yn equals y, and 1 otherwise.
+#     def _loss_function(self, yn: int, y: int) -> int:
+#         """ Loss function that returns 0 if yn equals y, and 1 otherwise.
 
-        Parameters
-        ----------
-        yn: int
-            classified label.
-        y: int
-            actual label.
+#         Parameters
+#         ----------
+#         yn: int
+#             classified label.
+#         y: int
+#             actual label.
 
-        Return
-        ------
-        loss: int
-            0 if yn equals y, and 1 otherwise.
-        """
+#         Return
+#         ------
+#         loss: int
+#             0 if yn equals y, and 1 otherwise.
+#         """
 
-        return (0 if yn == y else 100)
+#         return (0 if yn == y else 100)
 
-    def _separating_oracle(self, x_i, w, y_i, Y):
-        return y_i
+#     def _separating_oracle(self, x_i, w, y_i, Y):
+#         return y_i
 
-    def _argmin(self, w, slack, i, W):
-        return w, slack
+#     def _argmin(self, w, slack, i, W):
+#         return w, slack
 
-    def _phi(self, x: list, y: int) -> list:
-        """ Parameter vector that stacks x into position y.
-        Parameters
-        ----------
-        x: list
-            list of features
-        y: int
-            label
-        Return
-        ------
-        vector
-        """
+#     def _psi(self, x: list, y: int) -> list:
+#         """ Parameter vector that stacks x into position y.
+#         Parameters
+#         ----------
+#         x: list
+#             list of features
+#         y: int
+#             label
+#         Return
+#         ------
+#         vector
+#         """
 
-        vec = np.zeros((self.n_labels, self.n_features))
-        vec[y] = x
-        return vec
+#         vec = np.zeros((self.n_labels, self.n_features))
+#         vec[y] = x
+#         return vec
 
-    def train(self, data: pd.DataFrame, labels: list):
+#     def _kernel(self, a: np.array, b:):
+#         """ Linear kernel. """
+#         return np.inner(a, b)
+
+#     def _classify():
+#         dist=0
+#         for(i=1;i<model->sv_num;i+=1) {  
+#             dist+=self._kernel(&model->kernel_parm,model->supvec[i],ex)*model->alpha[i];
+#         }
+#         return(dist - self.b);
+
+#     def _classification_score(self, x,y,sm,sparm):
+#         """Return an example, label pair discriminant score."""
+#         score = self._classify(psi(x,y,sm,sparm))
+#         global thecount
+#         thecount += 1
+#         if (sum(abs(w) for w in sm.w)):
+#             import pdb; pdb.set_trace()
+#         return score
+
+#     def _predict(self, x):
+#         """Given a pattern x, return the predicted label."""
+#         scores = [(classification_score(x,c,sm,sparm), c)
+#                 for c in xrange(1,self.num_labels+1)]
+#         # Return the label with the max discriminant value.
+#         return max(scores)[1]
+
+#     def train(self, data: pd.DataFrame, labels: list):
+#         """
+#         Parameters
+#         ----------
+#         data: pandas dataframe
+#             dataframe containg all train data
+#         labels: list
+#             list of classes columns indexes
+#         """
+#         n = data.shape[0]  # get sample size
+#         self.n_features = n - 1
+
+#         # Get x and y
+#         x = data.drop(labels=data.columns[labels], axis=1).values
+#         y = data.iloc[:, labels]
+
+#         # Recover set of labels
+#         Y = data.classificacao_acidente.unique()
+#         self.n_labels = len(Y)
+
+#         # Init w
+#         self.w = np.zeros(self.n_features)
+
+#         # Init params
+#         W = [{} for i in range(n)]  # init set of constraints
+#         slacks = [0 for i in range(n)]  # init slack variables
+#         self.slack = 0  # stub
+
+#         # iterate until no W has changed during iteration
+#         repeat = True
+#         while repeat:
+#             repeat = False
+#             for i in range(n):
+#                 # Find the most violated constraint
+#                 y_hat = self._separating_oracle(x[i], self.w, y.iloc[:, i], Y)
+#                 # If this constraint is violated by more than the
+#                 # desired precision, the constraint is added to the working set
+#                 var1 = [self._psi(x[i], y[i]) - self._psi(x[i], y_hat)]
+#                 var = 1 - np.dot(self.w, var1)
+#                 precision = slacks[i] + self.e
+#                 if self._loss_function(y[i], y_hat) * var > precision:
+#                     repeat = True
+#                     W[i].append(y_hat)
+#                     self.w, self.slack = self._argmin(self.w, self.slack, i, W)
+
+
+class KNN(Model):
+
+    def __init__(self, metric: str, k: int):
+        self.metric = metric
+        self.k = k
+
+    def _euclidean_distance(self, point1, point2):
+        dist = 0.0
+        for i in range(len(point1)):
+            dist += (point2[i] - point1[i]) * (point2[i] - point1[i])
+        return np.sqrt(dist)
+
+    def _calculate_distance(self, point1, point2):
+        if self.metric == 'euclidean':
+            return self._euclidean_distance(point1, point2)
+
+    def train(self, data: pd.DataFrame, labels: str):
         """
         Parameters
         ----------
         data: pandas dataframe
             dataframe containg all train data
-        labels: list
-            list of classes columns indexes
+        labels: str
+            column name
         """
-        n = data.shape[0]  # get sample size
-        self.n_features = n - 1
+        self.train_size = data.shape[0]
+        # Extract classes
+        classes = data.loc[:, labels]
+        # Keep the instances
+        self.instances = data
 
-        # Get x and y
-        x = data.drop(labels=data.columns[labels], axis=1).values
-        y = data.iloc[:, labels]
+    def _predict(self, query: pd.Series) -> str:
+        """ Perform classification of one entry
 
-        # Recover set of labels
-        Y = data.classificacao_acidente.unique()
-        self.n_labels = len(Y)
+        Parameters
+        ----------
+        query: pd.Series
+            entry used for prediction
 
-        # Init w
-        self.w = np.zeros(self.n_features)
+        Return
+        ------
+        label: str
+            label for class classified for query
+        """
+        neighbors = []
 
-        # Init params
-        W = [{} for i in range(n)]  # init set of constraints
-        slacks = [0 for i in range(n)]  # init slack variables
-        self.slack = 0  # stub
+        # Measure the distance from the new data to all others data 
+        # that is already classified
+        distances = [(self._calculate_distance(query,instance[:-2]), instance[-1]) 
+                      for instance in self.instances]
+        
+        # Get the K smaller distances
+        neighbors = distances.sort(key=lambda tup: tup[0])[:self.k]
+        # Check the list of classes had the shortest distance and 
+        # count the amount of each class that appears
+        count_classes = { c: count}
+        for neighbor in neighbors:
+            c = neighbor[1] #  get class
+            count_classes[c] = count_classes.get(c, 0) + 1
+        # Takes as correct class the class that appeared the most times
+        label = max(count_classes.items(), key=operator.itemgetter(1))[0]
 
-        # iterate until no W has changed during iteration
-        repeat = True
-        while repeat:
-            repeat = False
-            for i in range(n):
-                # Find the most violated constraint
-                y_hat = self._separating_oracle(x[i], self.w, y.iloc[:, i], Y)
-                # If this constraint is violated by more than the
-                # desired precision, the constraint is added to the working set
-                var1 = [self._phi(x[i], y[i]) - self._phi(x[i], y_hat)]
-                var = 1 - np.dot(self.w, var1)
-                precision = slacks[i] + self.e
-                if self._loss_function(y[i], y_hat) * var > precision:
-                    repeat = True
-                    W[i].append(y_hat)
-                    self.w, self.slack = self._argmin(self.w, self.slack, i, W)
+        return label
+
+    def test(self, query: pd.DataFrame, actual_labels: list) -> list:
+        """Use the model for prediction.
+
+        Parameters
+        ----------
+        query: pd.DataFrame
+            features
+        actual_labels: list
+            true labels for query
+
+        Return
+        ------
+        labels: list
+            list of label for class classified for each entry
+        """
+        labels = []
+        n = query.shape[0]
+        i = 1
+        for index, row in query.iterrows():
+            label = self._predict(row)
+            labels.append(label)
+            print('Testing {}/{}'.format(i, n))
+            i += 1
+
+        self._confusion_matrix(actual_labels.values, labels, self.class_probabilities.keys())
+        return labels

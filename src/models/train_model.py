@@ -1,4 +1,4 @@
-from models import NaiveBayes, SVM
+from models import NaiveBayes, KNN
 import pandas as pd
 
 import argparse
@@ -27,19 +27,22 @@ assert(test_set.shape[1] == (df.shape[1]-1))
 
 if(model == 'naive_bayes'):
     trained = NaiveBayes()
-    trained.train(train_set, 'classificacao_acidente')
+# elif (model == "svm"):
+#     trained = SVM()
+#     trained.train(train_set, 'classificacao_acidente')
+elif (model == "knn"):
+    trained = KNN(3)
 
-    trained.test(test_set, test_labels)
-
-    print(trained._accuracy())
-
-    print("Trained")
-elif (model == "svm"):
-    trained = SVM()
-    trained.train(train_set, 'classificacao_acidente')
 else:
     print("Invalid type: " + model)
 
+trained.train(train_set, 'classificacao_acidente')
+
+trained.test(test_set, test_labels)
+
+print(trained._accuracy())
+
+print("Trained")
 # Serialize model using pickle
 date = datetime.now().strftime("%Y%m%d_%H%M")
 filename = 'models/{}_{}.pickle'.format(model, date)

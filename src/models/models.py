@@ -282,15 +282,12 @@ class NaiveBayes(Model):
 
 class KNN(Model):
 
-    def __init__(self, metric: str, k: int):
+    def __init__(self, k: int, metric: str = 'euclidean'):
         self.metric = metric
         self.k = k
 
     def _euclidean_distance(self, point1, point2):
-        dist = 0.0
-        for i in range(len(point1)):
-            dist += (point2[i] - point1[i]) * (point2[i] - point1[i])
-        return np.sqrt(dist)
+        return np.linalg.norm(point1-point2)
 
     def _calculate_distance(self, point1, point2):
         if self.metric == 'euclidean':
@@ -309,7 +306,7 @@ class KNN(Model):
         # Extract classes
         classes = data.loc[:, labels]
         # Keep the instances
-        self.instances = data
+        self.instances = data.values
 
     def _predict(self, query: pd.Series) -> str:
         """ Perform classification of one entry
@@ -324,24 +321,27 @@ class KNN(Model):
         label: str
             label for class classified for query
         """
-        neighbors = []
-
+        values = query.values
+        print("teste0")
         # Measure the distance from the new data to all others data 
         # that is already classified
-        distances = [(self._calculate_distance(query,instance[:-2]), instance[-1]) 
+        distances = [(self._calculate_distance(values, instance[:-1]), instance[-1]) 
                       for instance in self.instances]
+        print("teste1")
         
         # Get the K smaller distances
-        neighbors = distances.sort(key=lambda tup: tup[0])[:self.k]
+        distances.sort(key=lambda tup: tup[0])
+        neighbors = distances[:self.k]
+        print("teste2")
         # Check the list of classes had the shortest distance and 
         # count the amount of each class that appears
-        count_classes = { c: count}
+        count_classes = {}
         for neighbor in neighbors:
             c = neighbor[1] #  get class
             count_classes[c] = count_classes.get(c, 0) + 1
         # Takes as correct class the class that appeared the most times
         label = max(count_classes.items(), key=operator.itemgetter(1))[0]
-
+        print("teste3")
         return label
 
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:
@@ -368,5 +368,5 @@ class KNN(Model):
             print('Testing {}/{}'.format(i, n))
             i += 1
 
-        self._confusion_matrix(actual_labels.values, labels, self.class_probabilities.keys())
+        self._confusion_matrix(actual_labels.values, labels, np.unique(labels))
         return labels

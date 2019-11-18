@@ -24,7 +24,7 @@ test_set = df_copy.drop(train_set.index)
 test_labels = test_set['classificacao_acidente']
 test_set.drop(labels=['classificacao_acidente'], axis=1, inplace=True)
 assert(test_set.shape[1] == (df.shape[1]-1))
-
+print(test_labels.values[:4])
 if(model == 'naive_bayes'):
     trained = NaiveBayes()
 # elif (model == "svm"):

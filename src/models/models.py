@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from model import Model
 import operator
+from scipy.spatial import distance
 
 
 class NaiveBayes(Model):
@@ -289,9 +290,11 @@ class KNN(Model):
     def _euclidean_distance(self, point1, point2):
         return np.linalg.norm(point1-point2)
 
-    def _calculate_distance(self, point1, point2):
+    def _calculate_distance(self, point1: list, point2: list) -> float:
         if self.metric == 'euclidean':
             return self._euclidean_distance(point1, point2)
+        elif self.metric == 'manhattan':
+            return distance.cityblock(point1, point2)
 
     def train(self, data: pd.DataFrame, labels: str):
         """
@@ -304,9 +307,9 @@ class KNN(Model):
         """
         self.train_size = data.shape[0]
         # Extract classes
-        classes = data.loc[:, labels]
+        self.classes = data.loc[:, labels].values
         # Keep the instances
-        self.instances = data.values
+        self.instances = data.drop(labels, axis=1).values
 
     def _predict(self, query: pd.Series) -> str:
         """ Perform classification of one entry
@@ -322,26 +325,31 @@ class KNN(Model):
             label for class classified for query
         """
         values = query.values
-        print("teste0")
+        instances = self.instances
+        classes = self.classes
+        
         # Measure the distance from the new data to all others data 
         # that is already classified
-        distances = [(self._calculate_distance(values, instance[:-1]), instance[-1]) 
-                      for instance in self.instances]
-        print("teste1")
+        distances = [(self._calculate_distance(values, instance), classes[i]) 
+                      for i, instance in enumerate(instances)]
+
+        # Assert that labels are correct
+        # for distance in distances:
+            # assert(distance[1] in (1, 2, 3, 0))
         
         # Get the K smaller distances
         distances.sort(key=lambda tup: tup[0])
         neighbors = distances[:self.k]
-        print("teste2")
+        
         # Check the list of classes had the shortest distance and 
         # count the amount of each class that appears
         count_classes = {}
         for neighbor in neighbors:
             c = neighbor[1] #  get class
             count_classes[c] = count_classes.get(c, 0) + 1
+            
         # Takes as correct class the class that appeared the most times
         label = max(count_classes.items(), key=operator.itemgetter(1))[0]
-        print("teste3")
         return label
 
     def test(self, query: pd.DataFrame, actual_labels: list) -> list:

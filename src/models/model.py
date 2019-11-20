@@ -77,3 +77,8 @@ class Model():
     def to_string(self) -> str:
         """ Resumes all parameters of the model. """
         return ""
+
+    def report(self) -> str:
+        text = f"Accuracy:{acc:>10d}%"
+
+        return text

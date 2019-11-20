@@ -9,7 +9,7 @@ from models import KNN
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues):
+                          cmap=plt.cm.Blues, report=None):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -24,7 +24,9 @@ def plot_confusion_matrix(cm, classes,
     fig, ax = plt.subplots()
     
     # We want to show all ticks...
-    
+    ylabel = 'Predicted label'
+    if( metrics is not None):
+        ylabel += '\n {}'.format(metrics)
     ax.set(xticks=np.arange(4),
            yticks=np.arange(4),
            # ... and label them with the respective list entries
@@ -59,6 +61,6 @@ with open('models/knn_20191118_1151.pickle', 'rb') as f:
     model = pickle.load(f)
     confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
     plot_confusion_matrix(confusion_matrix, classes=['a', 'b' , 'c', 's'],
-                      title='Confusion matrix\n'+model.to_string())
+                      title='Confusion matrix\n'+model.to_string(), metrics=model.report())
 
     plt.show()

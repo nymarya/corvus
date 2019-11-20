@@ -89,6 +89,5 @@ class Model():
         text += f"\nINJURED_VICTIMS:   {precisions[1] *  100:.2f}%"
         text += f"\nIGNORED:               {precisions[2] *  100:.2f}%"
         text += f"\nNO_VICTIMS:           {precisions[3] *  100:.2f}%"
-        print(text)
         return text
         

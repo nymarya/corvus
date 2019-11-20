@@ -27,7 +27,7 @@ def plot_confusion_matrix(cm, classes,
     xlabel = 'Predicted label'
     if( metrics is not None):
         xlabel += '\n{}'.format(metrics)
-    print(xlabel)
+        
     ax.set(xticks=np.arange(4),
            yticks=np.arange(4),
            # ... and label them with the respective list entries

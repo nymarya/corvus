@@ -84,6 +84,6 @@ class Model():
         s = ""
         text = f"\nAccuracy:{acc:>20.2f}%"
         for i, precision in enumerate(self._precision()):
-            text += f"\nPrecision `{labels[i]}`:{precision*100:>20.2f}%"
+            text += f"\n{'P':<10}{precision*100:>20.2f}%".format(f"Precision `{labels[i]}`:")
 
         return text

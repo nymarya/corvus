@@ -22,7 +22,7 @@ def plot_confusion_matrix(cm, classes,
 
     print(cm)
 
-    fig, ax = plt.subplots(figsize=(15,15))
+    fig, ax = plt.subplots()
     
     # We want to show all ticks...
     
@@ -50,7 +50,7 @@ def plot_confusion_matrix(cm, classes,
     # fig.tight_layout()
     date = datetime.now().strftime("%Y%m%d_%H%M")
     filename = 'reports/figures/{}_{}.png'.format('knn', date)
-    plt.savefig(filename)
+    # plt.savefig(filename)
 
 
 # unpickle
@@ -60,6 +60,6 @@ with open('models/knn_20191118_1151.pickle', 'rb') as f:
     model = pickle.load(f)
     confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
     plot_confusion_matrix(confusion_matrix, classes=['a', 'b' , 'c', 's'],
-                      title='Confusion matrix, without normalization')
+                      title='Confusion matrix\n'+model.to_string())
 
     plt.show()

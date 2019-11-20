@@ -73,3 +73,7 @@ class Model():
             result.append( matrix[i][i] / precision_sum)
         
         return result
+
+    def to_string(self) -> str:
+        """ Resumes all parameters of the model. """
+        return ""

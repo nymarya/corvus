@@ -150,6 +150,8 @@ class NaiveBayes(Model):
         self._confusion_matrix(actual_labels.values, labels, self.class_probabilities.keys())
         return labels
 
+    def to_string(self) -> str:
+        return "NB, e = {}".format(self.e)
 
 # class SVM(Model):
 #     """ Implementation of support vector machine
@@ -378,3 +380,6 @@ class KNN(Model):
 
         self._confusion_matrix(actual_labels.values, labels, np.unique(labels))
         return labels
+
+    def to_string(self) -> str:
+        return "KNN, metric={}, k={}".format(self.metric, self.k)

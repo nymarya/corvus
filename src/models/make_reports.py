@@ -9,7 +9,7 @@ from models import KNN
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues, metrics=None):
+                          cmap=plt.cm.Blues, metrics=None, labels=None):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -59,8 +59,9 @@ with open('models/knn_20191118_1151.pickle', 'rb') as f:
     # The protocol version used is detected automatically, so we do not
     # have to specify it.
     model = pickle.load(f)
+    labels = ['com_vitimas_fatais','com_vitimas_feridas','ignorado','sem_vitimas']
     confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
-    plot_confusion_matrix(confusion_matrix, classes=['a', 'b' , 'c', 's'],
+    plot_confusion_matrix(confusion_matrix, classes=labels,
                       title='Confusion matrix\n'+model.to_string(), metrics=model.report())
 
     plt.show()

@@ -1,10 +1,11 @@
 import numpy as np
 
+
 class Model():
     """Class that every model enhiterates. """
 
     def _confusion_matrix(self, actual_labels: list,
-                        predicted_labels: list, classes:list) -> None:
+                          predicted_labels: list, classes: list) -> None:
         """ Creates confusion matrix for model.
 
         Parameters
@@ -47,7 +48,7 @@ class Model():
         assert(x.sum() == len(actual_labels))
 
     def _accuracy(self) -> float:
-        """Calculate the accuracy for the model. 
+        """Calculate the accuracy for the model.
 
         Return
         ------
@@ -70,8 +71,8 @@ class Model():
             for j in range(len(matrix)):
                 precision_sum += matrix[j][i]
             # Save precision
-            result.append( matrix[i][i] / precision_sum)
-        
+            result.append(matrix[i][i] / precision_sum)
+
         return result
 
     def to_string(self) -> str:
@@ -79,10 +80,8 @@ class Model():
         return ""
 
     def report(self) -> str:
-        labels = ['FATAL_VICTIMS','INJURED_VICTIMS','IGNORED','NO_VICTIMS']
         acc = self._accuracy() * 100
         precisions = self._precision()
-        s = ""
         text = f"\nAccuracy:         {acc:.2f}%"
         text += "\nPrecision"
         text += f"\nFATAL_VICTIMS:    {precisions[0] * 100:.2f}%"
@@ -90,4 +89,3 @@ class Model():
         text += f"\nIGNORED:               {precisions[2] *  100:.2f}%"
         text += f"\nNO_VICTIMS:           {precisions[3] *  100:.2f}%"
         return text
-        

@@ -11,7 +11,7 @@ parser.add_argument('model', metavar='string', type=str, nargs='?',
 parser.add_argument('--metric', metavar='string', type=str, nargs='?',
                     help='')
 parser.add_argument('--k', metavar='string', type=int, nargs='?',
-                    help='')                    
+                    help='')
 
 args = parser.parse_args()
 model = args.model

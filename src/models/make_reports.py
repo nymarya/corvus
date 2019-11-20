@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import itertools
 import pickle
 from datetime import datetime
 
-from models import KNN
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -22,12 +20,11 @@ def plot_confusion_matrix(cm, classes,
     print(cm)
 
     fig, ax = plt.subplots()
-    
     # We want to show all ticks...
     xlabel = 'Predicted label'
-    if( metrics is not None):
+    if(metrics is not None):
         xlabel += '\n{}'.format(metrics)
-        
+
     ax.set(xticks=np.arange(4),
            yticks=np.arange(4),
            # ... and label them with the respective list entries
@@ -53,7 +50,7 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     date = datetime.now().strftime("%Y%m%d_%H%M")
     filename = 'reports/figures/{}_{}.png'.format('knn', date)
-    # plt.savefig(filename)
+    plt.savefig(filename)
 
 
 # unpickle
@@ -61,9 +58,10 @@ with open('models/knn_20191118_1151.pickle', 'rb') as f:
     # The protocol version used is detected automatically, so we do not
     # have to specify it.
     model = pickle.load(f)
-    labels = ['FATAL_VICTIMS','INJURED_VICTIMS','IGNORED','NO_VICTIMS']
+    report = model.report()
+    labels = ['FATAL_VICTIMS', 'INJURED_VICTIMS', 'IGNORED', 'NO_VICTIMS']
     confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
-    plot_confusion_matrix(confusion_matrix, classes=labels,
-                      title='Confusion matrix\n'+model.to_string(), metrics=model.report())
+    plot_confusion_matrix(confusion_matrix, classes=labels, metrics=report,
+                          title='Confusion matrix\n'+model.to_string())
 
     plt.show()

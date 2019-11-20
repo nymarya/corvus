@@ -147,7 +147,8 @@ class NaiveBayes(Model):
             print('Testing {}/{}'.format(i, n))
             i += 1
 
-        self._confusion_matrix(actual_labels.values, labels, self.class_probabilities.keys())
+        classes = self.class_probabilities.keys()
+        self._confusion_matrix(actual_labels.values, labels, classes)
         return labels
 
     def to_string(self) -> str:
@@ -216,7 +217,7 @@ class NaiveBayes(Model):
 
 #     def _classify():
 #         dist=0
-#         for(i=1;i<model->sv_num;i+=1) {  
+#         for(i=1;i<model->sv_num;i+=1) {
 #             dist+=self._kernel(&model->kernel_parm,model->supvec[i],ex)*model->alpha[i];
 #         }
 #         return(dist - self.b);
@@ -271,16 +272,18 @@ class NaiveBayes(Model):
 #             repeat = False
 #             for i in range(n):
 #                 # Find the most violated constraint
-#                 y_hat = self._separating_oracle(x[i], self.w, y.iloc[:, i], Y)
-#                 # If this constraint is violated by more than the
-#                 # desired precision, the constraint is added to the working set
+#                 y_current = y.iloc[:, i]
+#                 y_hat = self._separating_oracle(x[i], self.w, y_current, Y)
+#                 # If this constraint is violated by more than the desired
+#                 # precision, the constraint is added to the working set
 #                 var1 = [self._psi(x[i], y[i]) - self._psi(x[i], y_hat)]
 #                 var = 1 - np.dot(self.w, var1)
 #                 precision = slacks[i] + self.e
 #                 if self._loss_function(y[i], y_hat) * var > precision:
 #                     repeat = True
 #                     W[i].append(y_hat)
-#                     self.w, self.slack = self._argmin(self.w, self.slack, i, W)
+#                     self.w, self.slack = self._argmin(self.w, self.slack, i,
+#                                                       W)
 
 
 class KNN(Model):
@@ -329,27 +332,27 @@ class KNN(Model):
         values = query.values
         instances = self.instances
         classes = self.classes
-        
-        # Measure the distance from the new data to all others data 
+
+        # Measure the distance from the new data to all others data
         # that is already classified
-        distances = [(self._calculate_distance(values, instance), classes[i]) 
-                      for i, instance in enumerate(instances)]
+        distances = [(self._calculate_distance(values, instance), classes[i])
+                     for i, instance in enumerate(instances)]
 
         # Assert that labels are correct
         # for distance in distances:
-            # assert(distance[1] in (1, 2, 3, 0))
-        
+        #   assert(distance[1] in (1, 2, 3, 0))
+
         # Get the K smaller distances
         distances.sort(key=lambda tup: tup[0])
         neighbors = distances[:self.k]
-        
-        # Check the list of classes had the shortest distance and 
+
+        # Check the list of classes had the shortest distance and
         # count the amount of each class that appears
         count_classes = {}
         for neighbor in neighbors:
-            c = neighbor[1] #  get class
+            c = neighbor[1]  # get class
             count_classes[c] = count_classes.get(c, 0) + 1
-            
+
         # Takes as correct class the class that appeared the most times
         label = max(count_classes.items(), key=operator.itemgetter(1))[0]
         return label

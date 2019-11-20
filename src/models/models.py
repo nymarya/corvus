@@ -26,7 +26,8 @@ class NaiveBayes(Model):
     # Equivalent sample size
     e = 1
 
-    def __init__(self, e: int = 1):
+    def __init__(self, labels:list, e: int = 1):
+        Model.__init__(labels)
         self.e = e
 
     def _calc_class_probabilities(self, classes: pd.Series) -> None:
@@ -285,7 +286,8 @@ class NaiveBayes(Model):
 
 class KNN(Model):
 
-    def __init__(self, k: int, metric: str = 'euclidean'):
+    def __init__(self, labels:int, k: int, metric: str = 'euclidean'):
+        Model.__init__(labels)
         self.metric = metric
         self.k = k
 

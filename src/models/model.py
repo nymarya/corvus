@@ -3,6 +3,9 @@ import numpy as np
 class Model():
     """Class that every model enhiterates. """
 
+    def __init__(self, classes: list):
+        self.labels = classes
+
     def _confusion_matrix(self, actual_labels: list,
                         predicted_labels: list, classes:list) -> None:
         """ Creates confusion matrix for model.
@@ -79,6 +82,11 @@ class Model():
         return ""
 
     def report(self) -> str:
-        text = f"Accuracy:{acc:>10d}%"
+        labels = ['com_vitimas_fatais','com_vitimas_feridas','ignorado','sem_vitimas']
+        acc = self._accuracy() * 100
+        s = ""
+        text = f"\nAccuracy:{acc:>10.2f}%"
+        for i, precision in enumerate(self._precision()):
+            text += f"\nPrecision `{labels[i]}`:{precision*100:>10.2f}%"
 
         return text

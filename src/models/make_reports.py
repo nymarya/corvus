@@ -9,7 +9,7 @@ from models import KNN
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
                           title='Confusion matrix',
-                          cmap=plt.cm.Blues, report=None):
+                          cmap=plt.cm.Blues, metrics=None):
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -24,16 +24,16 @@ def plot_confusion_matrix(cm, classes,
     fig, ax = plt.subplots()
     
     # We want to show all ticks...
-    ylabel = 'Predicted label'
+    xlabel = 'Predicted label'
     if( metrics is not None):
-        ylabel += '\n {}'.format(metrics)
+        xlabel += '\n {}'.format(metrics)
     ax.set(xticks=np.arange(4),
            yticks=np.arange(4),
            # ... and label them with the respective list entries
            xticklabels=classes, yticklabels=classes,
            title=title,
            ylabel='True label',
-           xlabel='Predicted label')
+           xlabel=xlabel)
     im = ax.imshow(cm, cmap=cmap)
     ax.figure.colorbar(im, ax=ax)
     # Rotate the tick labels and set their alignment.
@@ -48,7 +48,7 @@ def plot_confusion_matrix(cm, classes,
             ax.text(j, i, format(cm[i, j], fmt),
                     ha="center", va="center",
                     color="white" if cm[i, j] > thresh else "black")
-    # fig.tight_layout()
+    plt.tight_layout()
     date = datetime.now().strftime("%Y%m%d_%H%M")
     filename = 'reports/figures/{}_{}.png'.format('knn', date)
     # plt.savefig(filename)

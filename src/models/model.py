@@ -79,11 +79,16 @@ class Model():
         return ""
 
     def report(self) -> str:
-        labels = ['com_vitimas_fatais','com_vitimas_feridas','ignorado','sem_vitimas']
+        labels = ['FATAL_VICTIMS','INJURED_VICTIMS','IGNORED','NO_VICTIMS']
         acc = self._accuracy() * 100
+        precisions = self._precision()
         s = ""
-        text = f"\nAccuracy:{acc:>20.2f}%"
-        for i, precision in enumerate(self._precision()):
-            text += f"\n{'P':<10}{precision*100:>20.2f}%".format(f"Precision `{labels[i]}`:")
-
+        text = f"\nAccuracy:         {acc:.2f}%"
+        text += "\nPrecision"
+        text += f"\nFATAL_VICTIMS:    {precisions[0] * 100:.2f}%"
+        text += f"\nINJURED_VICTIMS:   {precisions[1] *  100:.2f}%"
+        text += f"\nIGNORED:               {precisions[2] *  100:.2f}%"
+        text += f"\nNO_VICTIMS:           {precisions[3] *  100:.2f}%"
+        print(text)
         return text
+        

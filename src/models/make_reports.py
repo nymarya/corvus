@@ -26,7 +26,8 @@ def plot_confusion_matrix(cm, classes,
     # We want to show all ticks...
     xlabel = 'Predicted label'
     if( metrics is not None):
-        xlabel += '\n {}'.format(metrics)
+        xlabel += '\n{}'.format(metrics)
+    print(xlabel)
     ax.set(xticks=np.arange(4),
            yticks=np.arange(4),
            # ... and label them with the respective list entries
@@ -48,6 +49,7 @@ def plot_confusion_matrix(cm, classes,
             ax.text(j, i, format(cm[i, j], fmt),
                     ha="center", va="center",
                     color="white" if cm[i, j] > thresh else "black")
+    fig.align_xlabels()
     plt.tight_layout()
     date = datetime.now().strftime("%Y%m%d_%H%M")
     filename = 'reports/figures/{}_{}.png'.format('knn', date)
@@ -59,7 +61,7 @@ with open('models/knn_20191118_1151.pickle', 'rb') as f:
     # The protocol version used is detected automatically, so we do not
     # have to specify it.
     model = pickle.load(f)
-    labels = ['com_vitimas_fatais','com_vitimas_feridas','ignorado','sem_vitimas']
+    labels = ['FATAL_VICTIMS','INJURED_VICTIMS','IGNORED','NO_VICTIMS']
     confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
     plot_confusion_matrix(confusion_matrix, classes=labels,
                       title='Confusion matrix\n'+model.to_string(), metrics=model.report())

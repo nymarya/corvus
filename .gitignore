@@ -96,3 +96,5 @@ local/
 
 # Cached models
 *.pickle
+
+teste.sh

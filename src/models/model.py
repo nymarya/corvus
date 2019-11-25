@@ -69,7 +69,7 @@ class Model():
         for i in range(len(matrix)):
             precision_sum = 0
             for j in range(len(matrix)):
-                precision_sum += matrix[j][i]
+                precision_sum += matrix[i][j]
             # Save precision
             result.append(matrix[i][i] / precision_sum)
 

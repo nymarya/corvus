@@ -35,7 +35,7 @@ train:
 
 ## Make visualization of result
 report: 
-	$(PYTHON_INTERPRETER) src/models/make_reports.py
+	$(PYTHON_INTERPRETER) src/models/make_reports.py $(model)
 
 ## Delete all compiled Python files
 clean:

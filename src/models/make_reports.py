@@ -2,9 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 from datetime import datetime
+import argparse
+import os
 
-
-def plot_confusion_matrix(cm, classes,
+def plot_confusion_matrix(model, cm, classes,
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues, metrics=None, labels=None):
@@ -48,20 +49,33 @@ def plot_confusion_matrix(cm, classes,
                     color="white" if cm[i, j] > thresh else "black")
     fig.align_xlabels()
     plt.tight_layout()
-    date = datetime.now().strftime("%Y%m%d_%H%M")
-    filename = 'reports/figures/{}_{}.png'.format('knn', date)
+    filename = 'reports/figures/{}.png'.format(model)
     plt.savefig(filename)
 
+# Receive argument
+parser = argparse.ArgumentParser(description='Recove models.')
+parser.add_argument('files', metavar='string', type=str, nargs='?',
+                    help='')
 
-# unpickle
-with open('models/knn_20191118_1151.pickle', 'rb') as f:
-    # The protocol version used is detected automatically, so we do not
-    # have to specify it.
-    model = pickle.load(f)
-    report = model.report()
-    labels = ['FATAL_VICTIMS', 'INJURED_VICTIMS', 'IGNORED', 'NO_VICTIMS']
-    confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
-    plot_confusion_matrix(confusion_matrix, classes=labels, metrics=report,
-                          title='Confusion matrix\n'+model.to_string())
+args = parser.parse_args()
+substr = args.files
 
-    plt.show()
+for filename in os.listdir('models'):
+    # unpickle
+    model = os.path.join("models", filename)
+    # filter files
+    if substr not in filename:
+        continue
+    with open(model, 'rb') as f:
+        name = filename.split('.')[0]
+        # The protocol version used is detected automatically, so we do not
+        # have to specify it.
+        model = pickle.load(f)
+        report = model.report()
+        labels = ['FATAL_VICTIMS', 'INJURED_VICTIMS', 'IGNORED', 'NO_VICTIMS']
+        confusion_matrix = np.matrix(model.confusion_matrix['matrix'])
+        plot_confusion_matrix(name, confusion_matrix, classes=labels,
+                              metrics=report,
+                              title='Confusion matrix\n'+model.to_string())
+
+        # plt.show()

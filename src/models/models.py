@@ -147,7 +147,8 @@ class NaiveBayes(Model):
             print('Testing {}/{}'.format(i, n))
             i += 1
 
-        classes = self.class_probabilities.keys()
+        classes = np.unique(labels)
+        print(np.unique(labels))
         self._confusion_matrix(actual_labels.values, labels, classes)
         return labels
 

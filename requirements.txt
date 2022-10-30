@@ -80,7 +80,7 @@ pickleshare==0.7.5
 pkginfo==1.8.1
 platformdirs==2.4.0
 pluggy==0.12.0
-poetry==1.1.7
+poetry==1.1.9
 poetry-core==1.0.4
 poyo==0.5.0
 prf-api==0.1.11

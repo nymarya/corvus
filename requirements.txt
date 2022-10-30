@@ -63,7 +63,7 @@ mistune==0.8.4
 more-itertools==7.0.0
 msgpack==1.0.3
 nbclassic==0.2.7
-nbconvert==5.6.0
+nbconvert==6.5.1
 nbformat==4.4.0
 nest-asyncio==1.5.1
 notebook==6.1.5

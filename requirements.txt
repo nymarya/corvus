@@ -87,7 +87,7 @@ prf-api==0.1.11
 prometheus-client==0.7.1
 prompt-toolkit==2.0.9
 ptyprocess==0.6.0
-py==1.8.0
+py==1.11.0
 pycosat==0.6.3
 pycparser==2.19
 Pygments==2.7.4
